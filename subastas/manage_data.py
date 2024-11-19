@@ -1,8 +1,8 @@
 try:
     from datetime import datetime
     import csv
-    import subastas.send_mail as send_email
-    from subastas import data_base
+    # import subastas.send_mail as send_email
+    import data_base
     from datetime import timedelta
     print("Librerias importadas")
 except Exception as e:
@@ -11,7 +11,7 @@ except Exception as e:
 # Leer y procesar el archivo CSV
 def save():
     # Validacion de registros anteriores
-    delete_old_records()      
+    # delete_old_records()      
     try:
         with open("subastas.csv", mode="r", encoding='utf-8') as file:
             reader = csv.reader(file)
@@ -26,11 +26,6 @@ def save():
                 if len(row) < 12:
                     print("Fila incompleta, se omite:", row)
                     continue  # Si la fila no tiene suficientes columnas, se omite
-
-                # Omitir la última fila si es vacía o no contiene datos válidos
-                if row[11] == '' or row[11] is None:
-                    print(f"Omitiendo la fila sin fecha: {row}")
-                    continue  # Omite la fila si no contiene fecha válida
 
                 # Convertir el valor de fecha a un formato que SQL Server pueda reconocer
                 try:
@@ -66,11 +61,13 @@ def save():
     except Exception as e:
         print("Ocurrió un error al procesar el archivo CSV:", e)
         data_base.log_to_db(2, "ERROR", f"Ocurrio un error al guardar la informacion en la base de datos,{e} ", endpoint='fallido', status_code=500)
-        send_email(f"Ocurrio un error al guardar la informacion en la base de datos,{e} ")
+        # send_email(f"Ocurrio un error al guardar la informacion en la base de datos,{e} ")
+
+save()
 
 def delete_old_records():
     try:
-        # Obtener la fecha límite (hoy - 44 días)
+        # Obtener la fecha límite (hoy - 15 días)
         fecha_limite = (datetime.now() - timedelta(days=15)).date()
 
         # Eliminación para la tabla de ventas
@@ -87,5 +84,5 @@ def delete_old_records():
         print("Eliminación completada exitosamente.")
     except Exception as e:
         data_base.log_to_db(2, "ERROR", f"Ocurrio un error al eliminar los registros de 45 días, {e}", endpoint='fallido', status_code=500)
-        send_email.send_error_email(f"Ocurrio un error al eliminar los registros de 45 días, {e}")
+        # send_email.send_error_email(f"Ocurrio un error al eliminar los registros de 45 días, {e}")
         print(f"Ocurrió un error durante la eliminación de registros: {e}")

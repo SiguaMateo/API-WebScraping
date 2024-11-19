@@ -24,7 +24,7 @@ def default_endpoint():
 @app.get("/get-sales", description="Endpoint para obtener las ventas")
 def webscraping_sales_endpoint():
     try:
-        start_date, end_date = validation.generate_monthly_urls_auctions()
+        start_date, end_date = validation.get_dates()
         url = f"https://fp042301.freshportal.nl/management/total/index/group/WEEK%28INV_PrintedDate%29%2CINV_PrintedDate%2CCUG_Name%2CCOALESCE%28INV_Number%3B+INV_CollectiveInvoiceNumber%29%2Cpref_cus.CUS_Name%2Ccustomer_country.COU_Name%2CPRD_Name%2CCLD_Name%2CCSI_Description%2Cactual_stock_entry.STE_Weight%2CCSI_QuantityPerPack%2Cpref_cus.CUS_Code%2CPGD_Name%2CCGD_Name%2CYEAR%28INV_PrintedDate%29%2CMONTH%28INV_PrintedDate%29%2CDAY%28INV_PrintedDate%29%2CHOUR%28INV_PrintedDate%29%2C%2C%2C/start_date/{start_date}/end_date/{end_date}/printed/0/chart_data/CSI_Quantity/limit/1000/extra_filters/%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C/"
         main_file_ventas.scrape_table(url)
         main_file_ventas.driver.quit()
@@ -97,4 +97,4 @@ def startup_event():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=9001, workers=True)
+    uvicorn.run(app, host="0.0.0.0", port=9090)

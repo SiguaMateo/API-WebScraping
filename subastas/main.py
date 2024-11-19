@@ -13,8 +13,8 @@ try:
     import pandas as pd
     import re
     import time
-    import subastas.send_mail as send_email
-    from subastas import data_base
+    # import subastas.send_mail as send_email
+    # from subastas import data_base
     from datetime import datetime,timedelta
     import os
 except Exception as e:
@@ -51,8 +51,8 @@ def login():
             print("Ocurrio un error al iniciar sesion, ", e)
             time.sleep(3)
             if retries == max_retries:
-                data_base.log_to_db(2, "ERROR", f"Ocurrio un error al iniciar sesión, {e}", endpoint='fallido', status_code=500)
-                send_email.send_error_email(f"Ocurrio un error al inciar sesión, {e}")
+                # data_base.log_to_db(2, "ERROR", f"Ocurrio un error al iniciar sesión, {e}", endpoint='fallido', status_code=500)
+                # send_email.send_error_email(f"Ocurrio un error al inciar sesión, {e}")
                 raise
         finally:
             if retries == max_retries:
@@ -60,7 +60,7 @@ def login():
 
 def wait_table():
     try:
-        WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "table.ajax_table_table tbody"))
         )
         print("Tabla cargada correctamente")
@@ -75,7 +75,7 @@ def scroll_down():
 def go_to_next_page():
     try:
         # Comprobar si el botón "Next" está presente y es clicable
-        next_button = WebDriverWait(driver, 10).until(
+        next_button = WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.XPATH, "//a[@class='page-link next_page waves-effect' and @aria-label='Next']"))
         )
 
@@ -88,7 +88,7 @@ def go_to_next_page():
         driver.execute_script("arguments[0].scrollIntoView();", next_button)
         driver.execute_script("arguments[0].click();", next_button)
         print("Pasando a la siguiente página...")
-        time.sleep(3)  # Espera para que la página cargue el nuevo contenido
+        time.sleep(1)  # Espera para que la página cargue el nuevo contenido
         return True
     except TimeoutException:
         print("No hay más páginas o no se encontró el botón de siguiente página.")
@@ -113,7 +113,7 @@ def scrape_table(url):
             page_number = 1
             while True:
                 print(f"Scrapeando la página {page_number}...")
-                time.sleep(10)
+                time.sleep(5)
 
                 # Scroll hacia abajo para cargar contenido adicional
                 scroll_down()
@@ -140,7 +140,7 @@ def scrape_table(url):
 
                 for i, row in enumerate(table_rows):
                     cells = row.find_all(['td', 'th'])
-                    cell_values = [cell.get_text(strip=True).replace("€", "").replace("%", "").replace(",", ".").replace(" ", "") for cell in cells]
+                    cell_values = [cell.get_text(strip=True).replace("€", "").replace("%", "").replace(",", ".") for cell in cells]
 
                     if i == 0 and not headers:
                         # Almacenar encabezados y omitir la primera y la columna 15
@@ -182,7 +182,7 @@ def scrape_table(url):
             df.to_csv(csv_filename, mode='a', index=False, header=not file_exists)
             print(f"Data {i+1} guardada como '{csv_filename}'")
 
-            return df
+            # return df
 
             break 
             
@@ -190,12 +190,12 @@ def scrape_table(url):
 
         except Exception as e:
             retries += 1
-            time.sleep(3)
+            time.sleep(1)
             print("Ocurrio un error al obtener los datos de la tabla, ", e)
             if retries == max_retries:
                 raise
-            data_base.log_to_db(2, "ERROR", f"Ocurrio un error al realizar el webscraping de subastas, {e}", endpoint='fallido', status_code=500)
-            send_email.send_error_email(f"Ocurrio un error al realizar el webscraping de subastas, {e}")
+            # data_base.log_to_db(2, "ERROR", f"Ocurrio un error al realizar el webscraping de subastas, {e}", endpoint='fallido', status_code=500)
+            # send_email.send_error_email(f"Ocurrio un error al realizar el webscraping de subastas, {e}")
             break
         finally:
             if retries == max_retries:
@@ -252,7 +252,7 @@ def clean_value(value):
 #     """
 #     Realiza el scraping de datos para todas las fechas especificadas.
 #     """
-#     start_date = datetime.strptime("2024-10-16", '%Y-%m-%d')  # Cambia la fecha según necesites
+#     start_date = datetime.strptime("2024-11-16", '%Y-%m-%d')  # Cambia la fecha según necesites
 #     end_date = datetime.today()
 
 #     # Generar las URLs mensuales

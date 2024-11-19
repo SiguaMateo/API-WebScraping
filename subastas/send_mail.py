@@ -28,7 +28,7 @@ def send_error_email(error_message):
         msg['To'] = "sistemas@starflowers.com.ec"
         
         # Enviar el correo
-        server.sendmail("pasante.sistemas@starflowers.com.ec", "sistemas@starflowers.com.ec", msg.as_string())
+        #server.sendmail("pasante.sistemas@starflowers.com.ec", "sistemas@starflowers.com.ec", msg.as_string())
         
         data_base.log_to_db(2, "INFO", "correo enviado", endpoint='exitoso', status_code=200)
         server.quit()

@@ -11,8 +11,8 @@ try:
     import pandas as pd
     import re
     import os
-    from ventas import data_base
-    import ventas.send_mail as send_email
+    # from ventas import data_base
+    # import ventas.send_mail as send_email
     import time
     from datetime import timedelta, datetime
     print("Librerias Importadas")
@@ -49,8 +49,8 @@ def login():
             print("Ocurrio un error al iniciar sesion, ", e)
             time.sleep(3)
             if retries == max_retries:
-                data_base.log_to_db(1, "ERROR", f"Ocurrio un error al iniciar sesion, {e}", endpoint='fallido', status_code=500)
-                send_email.send_error_email(f"Ocurrio un error al inciar sesion, {e}")
+                # data_base.log_to_db(1, "ERROR", f"Ocurrio un error al iniciar sesion, {e}", endpoint='fallido', status_code=500)
+                # send_email.send_error_email(f"Ocurrio un error al inciar sesion, {e}")
                 raise
         finally:
             if retries == max_retries:
@@ -63,7 +63,7 @@ def scrape_table(url):
         try:
             driver.get(url)
 
-            WebDriverWait(driver, 40).until(
+            WebDriverWait(driver, 15).until(
                 EC.presence_of_element_located((By.ID, "management_total_table"))
             )
 
@@ -85,7 +85,7 @@ def scrape_table(url):
                         raise
 
                     cells = row.find_all(['td', 'th'])
-                    cell_values = [cell.get_text(strip=True).replace("€", "").replace("%", "").replace(" ",'') for cell in cells]
+                    cell_values = [cell.get_text(strip=True).replace("€", "").replace("%", "") for cell in cells]
 
                     if j == 0:
                         headers = cell_values
@@ -114,17 +114,17 @@ def scrape_table(url):
                 df.to_csv(csv_filename, mode='a', index=False, header=not file_exists)
                 print(f"Data {i+1} guardada como '{csv_filename}'")
 
-                return df
+                # return df
 
             break
 
         except Exception as e:
             retries += 1
-            time.sleep(3)
+            time.sleep(1)
             print("Ocurrio un error al encontrar y extraer los datos de la tabla, ", e)
             if retries == max_retries:
-                data_base.log_to_db(1, "ERROR", f"Ocurrio un error al extraer los datos de la página web, {e}", endpoint='fallido', status_code=500)
-                send_email(f"Ocurrio un error al extraer los datos de la página web, {e}")
+                # data_base.log_to_db(1, "ERROR", f"Ocurrio un error al extraer los datos de la página web, {e}", endpoint='fallido', status_code=500)
+                # send_email(f"Ocurrio un error al extraer los datos de la página web, {e}")
                 raise
         finally:
             if retries == max_retries:

@@ -40,24 +40,24 @@ except Exception as e:
 #         cursor.execute("""
 #             CREATE TABLE rptFresh_Portal_Subastas_Dev (
 #                 id INT PRIMARY KEY IDENTITY(1,1),
-#                 reg_name NVARCHAR(50),
-#                 lot_number NVARCHAR(20),
-#                 auction_date DATE,
-#                 reg_date DATE,
-#                 description_rgt NVARCHAR(50),
-#                 reg_weight INT,
-#                 colour_treated NVARCHAR(20),
-#                 packaging_code INT,
-#                 quantity INT,
-#                 content INT,
-#                 total FLOAT,
-#                 price FLOAT,
-#                 total_price FLOAT,
-#                 average_lot_price FLOAT,
-#                 code NVARCHAR(20),
-#                 buyer NVARCHAR(50),
-#                 trading_instrument NVARCHAR(25),
-#                 sales_channel NVARCHAR(25)
+#                 sub_name NVARCHAR(50),
+#                 sub_lot_number NVARCHAR(20),
+#                 sub_auction_date DATE,
+#                 sub_date DATE,
+#                 sub_description NVARCHAR(75),
+#                 sub_weight INT,
+#                 sub_colour_treated NVARCHAR(20),
+#                 sub_packaging_code INT,
+#                 sub_quantity INT,
+#                 sub_content INT,
+#                 sub_total FLOAT,
+#                 sub_price FLOAT,
+#                 sub_total_price FLOAT,
+#                 sub_average_lot_price FLOAT,
+#                 sub_code NVARCHAR(20),
+#                 sub_buyer NVARCHAR(50),
+#                 sub_trading_instrument NVARCHAR(25),
+#                 sub_sales_channel NVARCHAR(25)
 #             )
 #         """)
 #         conn.commit()

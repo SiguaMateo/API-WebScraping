@@ -1,14 +1,14 @@
 try:
     import csv
-    from ventas import data_base
+    import data_base
     from datetime import datetime, timedelta
-    import ventas.send_mail as send_email
+    # import ventas.send_mail as send_email
 except Exception as e:
     print("Ocurrio un error al importar las librerias, ", e)
 
 def save():
     # Validacion de registros anteriores
-    delete_old_records()
+    # delete_old_records()
                     
     # Leer y procesar el archivo CSV
     try:
@@ -22,11 +22,6 @@ def save():
             for row in reader:
                 print("Ingreso al bucle")
                 print("Longitud de la fila:", len(row))
-
-                # Omitir la última fila si es vacía o no contiene datos válidos
-                if row[11] == '' or row[11] is None:
-                    print(f"Omitiendo la fila sin fecha: {row}")
-                    continue  # Omite la fila si no contiene fecha válida
 
                 # Limpia y convierte columnas numéricas
                 try:
@@ -52,7 +47,7 @@ def save():
                     if isinstance(fecha_str, str) and fecha_str.count('-') == 2:
                         try:
                             fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-                            row[11] = fecha_obj  # Reemplaza el valor en la fila con la fecha convertida
+                            row[1] = fecha_obj  # Reemplaza el valor en la fila con la fecha convertida
                         except ValueError:
                             print(f"Fecha no válida en la fila: {row}")
                             continue  # Si la fecha no se puede convertir, omitir la fila
@@ -79,11 +74,13 @@ def save():
     except Exception as e:
         print(f"Ocurrió un error al procesar el archivo CSV: {e}")
         data_base.log_to_db(1, "ERROR", f"Ocurrio un error al guardar la informacion en la base de datos, {e}", endpoint='fallido', status_code=500)
-        send_email(f"Ocurrió un error al guardar la informacion en la base de datos: {e}")
+        # send_email(f"Ocurrió un error al guardar la informacion en la base de datos: {e}")
+
+save()
 
 def delete_old_records():
     try:
-        # Obtener la fecha límite (hoy - 44 días)
+        # Obtener la fecha límite (hoy - 15 días)
         fecha_limite = (datetime.now() - timedelta(days=15)).date()
 
         # Eliminación para la tabla de ventas
@@ -101,5 +98,5 @@ def delete_old_records():
     except Exception as e:
         print(f"Ocurrió un error durante la eliminación de registros: {e}")
         data_base.log_to_db(1, "ERROR", f"Ocurrio un error al eliminar los registros de 45 días, {e}", endpoint='fallido', status_code=500)
-        send_email.send_error_email(f"Ocurrio un error al eliminar los registros de 45 días, {e}")
+        # send_email.send_error_email(f"Ocurrio un error al eliminar los registros de 45 días, {e}")
         print(f"Ocurrió un error durante la eliminación de registros: {e}")
