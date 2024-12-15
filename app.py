@@ -21,33 +21,33 @@ app =  FastAPI(
 def default_endpoint():
     return {"message": "Inicio la API de WebScraping"}
 
-@app.get("/get-sales", description="Endpoint para obtener las ventas")
-def webscraping_sales_endpoint():
-    try:
-        start_date, end_date = validation.get_dates()
-        url = f"https://fp042301.freshportal.nl/management/total/index/group/WEEK%28INV_PrintedDate%29%2CINV_PrintedDate%2CCUG_Name%2CCOALESCE%28INV_Number%3B+INV_CollectiveInvoiceNumber%29%2Cpref_cus.CUS_Name%2Ccustomer_country.COU_Name%2CPRD_Name%2CCLD_Name%2CCSI_Description%2Cactual_stock_entry.STE_Weight%2CCSI_QuantityPerPack%2Cpref_cus.CUS_Code%2CPGD_Name%2CCGD_Name%2CYEAR%28INV_PrintedDate%29%2CMONTH%28INV_PrintedDate%29%2CDAY%28INV_PrintedDate%29%2CHOUR%28INV_PrintedDate%29%2C%2C%2C/start_date/{start_date}/end_date/{end_date}/printed/0/chart_data/CSI_Quantity/limit/1000/extra_filters/%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C/"
-        main_file_ventas.scrape_table(url)
-        main_file_ventas.driver.quit()
-        # manage_data_ventas.save()
-        print(f"Ventas fecha: {start_date} - {end_date}")
-        return {"message": "Scraping realizado con éxito de las ventas"}
-    except Exception as e:
-        print(f"Ocurrió un error al obtener los datos de las ventas: {e}")
-        return {"Ocurrio un error al obtener los datos de las ventas ": str(e)}
+# @app.get("/get-sales", description="Endpoint para obtener las ventas")
+# def webscraping_sales_endpoint():
+#     try:
+#         start_date, end_date = validation.get_dates()
+#         url = f"https://fp042301.freshportal.nl/management/total/index/group/WEEK%28INV_PrintedDate%29%2CINV_PrintedDate%2CCUG_Name%2CCOALESCE%28INV_Number%3B+INV_CollectiveInvoiceNumber%29%2Cpref_cus.CUS_Name%2Ccustomer_country.COU_Name%2CPRD_Name%2CCLD_Name%2CCSI_Description%2Cactual_stock_entry.STE_Weight%2CCSI_QuantityPerPack%2Cpref_cus.CUS_Code%2CPGD_Name%2CCGD_Name%2CYEAR%28INV_PrintedDate%29%2CMONTH%28INV_PrintedDate%29%2CDAY%28INV_PrintedDate%29%2CHOUR%28INV_PrintedDate%29%2Ccustomer_stock_item_fust.FUS_Code%2C%2C/start_date/{start_date}/end_date/{end_date}/printed/0/chart_data/CSI_Quantity/limit/1000/extra_filters/%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C%7C/"
+#         main_file_ventas.scrape_table(url)
+#         main_file_ventas.driver.quit()
+#         # manage_data_ventas.save()
+#         print(f"Ventas fecha: {start_date} - {end_date}")
+#         return {"message": "Scraping realizado con éxito de las ventas"}
+#     except Exception as e:
+#         print(f"Ocurrió un error al obtener los datos de las ventas: {e}")
+#         return {"Ocurrio un error al obtener los datos de las ventas ": str(e)}
 
-@app.get("/get-auctions", description="Endpoint para obtener las subastas")
-def webscraping_auctions_endpoint():
-    try:
-        start_date, end_date = validation.get_dates()
-        url = f"https://fp042301.freshportal.nl/floriday_io_yield/index/index/?1=1&page=1&auction_date_from={start_date}&auction_date_to={end_date}#!"
-        main_file_subastas.scrape_table(url)
-        main_file_subastas.driver.quit()
-        manage_data_subastas.save()
-        print(f"Ventas fecha: {start_date} - {end_date}")
-        return {"message": "Scraping realizado con éxito de las subastas"}
-    except Exception as e:
-        print(f"Ocurrio un error al obtener los datos de las subastas: {e}")
-        return {f"Ocurrio un error al obtener los datos de las subastas: {str(e)}"}
+# @app.get("/get-auctions", description="Endpoint para obtener las subastas")
+# def webscraping_auctions_endpoint():
+#     try:
+#         start_date, end_date = validation.get_dates()
+#         url = f"https://fp042301.freshportal.nl/floriday_io_yield/index/index/?1=1&page=1&auction_date_from={start_date}&auction_date_to={end_date}#!"
+#         main_file_subastas.scrape_table(url)
+#         main_file_subastas.driver.quit()
+#         manage_data_subastas.save()
+#         print(f"Ventas fecha: {start_date} - {end_date}")
+#         return {"message": "Scraping realizado con éxito de las subastas"}
+#     except Exception as e:
+#         print(f"Ocurrio un error al obtener los datos de las subastas: {e}")
+#         return {f"Ocurrio un error al obtener los datos de las subastas: {str(e)}"}
     
 # @app.get("/save-sales", description="Endpoint para almacenar las ventas en la base de datos")
 # def save_sales_endpoint():

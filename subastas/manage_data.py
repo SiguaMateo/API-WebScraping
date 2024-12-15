@@ -3,17 +3,39 @@ try:
     import csv
     # import subastas.send_mail as send_email
     import data_base
-    from datetime import timedelta
     print("Librerias importadas")
 except Exception as e:
     print("Ocurrio un error al importar las librerias en subastas manage, ", e)
+
+def delete_old_records():
+    try:
+        # Obtener la fecha límite (hoy - 15 días)
+        fecha_limite = '2024-11-01'
+
+        # Eliminación para la tabla de ventas
+        ventas_query = """
+        DELETE FROM rptFresh_Portal_Subastas_Dev
+        WHERE sub_auction_date > ?
+        """
+        # Aquí solo necesitas pasar un parámetro en lugar de dos
+        data_base.cursor.execute(ventas_query, (fecha_limite,))
+        print(f"Registros eliminados en Ventas hasta la fecha: {fecha_limite} ")
+
+        # Confirmar cambios
+        data_base.conn.commit()
+        print("Eliminación completada exitosamente.")
+    except Exception as e:
+        # data_base.log_to_db(2, "ERROR", f"Ocurrio un error al eliminar los registros de 45 días, {e}", endpoint='fallido', status_code=500)
+        # send_email.send_error_email(f"Ocurrio un error al eliminar los registros de 45 días, {e}")
+        print(f"Ocurrió un error durante la eliminación de registros: {e}")
+
 
 # Leer y procesar el archivo CSV
 def save():
     # Validacion de registros anteriores
     # delete_old_records()      
     try:
-        with open("subastas.csv", mode="r", encoding='utf-8') as file:
+        with open("subastas_nsasew.csv", mode="r", encoding='utf-8') as file:
             reader = csv.reader(file)
             next(reader)  # Salta los encabezados
             print("Ingresa al bloque de inserción de datos desde el csv")
@@ -60,29 +82,8 @@ def save():
             print("Datos insertados desde el CSV exitosamente.")
     except Exception as e:
         print("Ocurrió un error al procesar el archivo CSV:", e)
-        data_base.log_to_db(2, "ERROR", f"Ocurrio un error al guardar la informacion en la base de datos,{e} ", endpoint='fallido', status_code=500)
+        # data_base.log_to_db(2, "ERROR", f"Ocurrio un error al guardar la informacion en la base de datos,{e} ", endpoint='fallido', status_code=500)
         # send_email(f"Ocurrio un error al guardar la informacion en la base de datos,{e} ")
 
 save()
 
-def delete_old_records():
-    try:
-        # Obtener la fecha límite (hoy - 15 días)
-        fecha_limite = (datetime.now() - timedelta(days=15)).date()
-
-        # Eliminación para la tabla de ventas
-        ventas_query = """
-        DELETE FROM rptFresh_Portal_Subastas_Dev
-        WHERE auction_date >= ?
-        """
-        # Aquí solo necesitas pasar un parámetro en lugar de dos
-        data_base.cursor.execute(ventas_query, (fecha_limite,))
-        print(f"Registros eliminados en Ventas hasta la fecha: {fecha_limite}")
-
-        # Confirmar cambios
-        data_base.conn.commit()
-        print("Eliminación completada exitosamente.")
-    except Exception as e:
-        data_base.log_to_db(2, "ERROR", f"Ocurrio un error al eliminar los registros de 45 días, {e}", endpoint='fallido', status_code=500)
-        # send_email.send_error_email(f"Ocurrio un error al eliminar los registros de 45 días, {e}")
-        print(f"Ocurrió un error durante la eliminación de registros: {e}")

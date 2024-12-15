@@ -46,7 +46,7 @@ except Exception as e:
 #                 vent_country_of_client NVARCHAR(50),
 #                 vent_product NVARCHAR(50),
 #                 vent_colour NVARCHAR(50),
-#                 vent_description_allocation NVARCHAR(75),
+#                 vent_description_allocation NVARCHAR(100),
 #                 vent_weight INT, 
 #                 vent_content INT,
 #                 vent_customer_code NVARCHAR(20),
@@ -56,8 +56,9 @@ except Exception as e:
 #                 vent_month_billing_date INT,
 #                 vent_day_invoice_date INT,
 #                 vent_hour_invoice_date INT,
-#                 vent_total_pieces NUMERIC(10, 2),
-#                 vent_total_packages NUMERIC(10, 2),
+#                 vent_packaging INT,
+#                 vent_total_pieces NUMERIC(10),
+#                 vent_total_packages NUMERIC(10),
 #                 vent_purchase NUMERIC(10, 2),
 #                 vent_sale NUMERIC(10, 2), 
 #                 vent_unit_price NUMERIC(10, 2), 
@@ -73,6 +74,19 @@ except Exception as e:
 
 # create_table_Data()
 
+def drop_table_Data():
+    with conn.cursor() as cursor:
+        # Verificar si la tabla existe y eliminarla si es así
+        cursor.execute("""
+            IF EXISTS (SELECT * FROM sysobjects WHERE name='rptFresh_Portal_Ventas_Test' AND xtype='U')
+            BEGIN
+                DROP TABLE rptFresh_Portal_Ventas_Test
+            END
+        """)
+        conn.commit()
+
+drop_table_Data()
+
 def log_to_db(id_group, log_level, message, endpoint=None, status_code=None):
     with conn.cursor() as cursor:
         cursor.execute("""
@@ -81,9 +95,21 @@ def log_to_db(id_group, log_level, message, endpoint=None, status_code=None):
         """, id_group, log_level, message, endpoint, status_code)
         conn.commit()
 
+def get_url_login():
+    try:
+        result = cursor.execute(url_login_query).fetchone()
+        if result:
+            url = result[0]
+            return str(url)
+        else:
+            print("No se pudo obtener la url login")
+            return None
+    except Exception as e:
+        print(f"Error al obtener la url login, {e}")
+
 def getUser():
     try:
-        result = conn.execute(user_WSCVETS).fetchone()
+        result = cursor.execute(user_WSCVETS).fetchone()
         if result:
             user = result[0]
             return str(user)
@@ -96,7 +122,7 @@ def getUser():
 
 def getPass():
     try:
-        result = conn.execute(password_WSCVETS).fetchone()
+        result = cursor.execute(password_WSCVETS).fetchone()
         if result:
             password = result[0]
             return str(password)
@@ -117,5 +143,9 @@ password_WSCVETS = """SELECT prm_valor
 
 # sql Querys
 insert_query = """
-    INSERT INTO rptFresh_Portal_Ventas_Dev VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO rptFresh_Portal_Ventas_Dev VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
+
+url_login_query = """SELECT prm_valor
+                FROM dbo.Parametros_Sistema
+                WHERE id_grupo = 1 AND prm_descripcion = 'url'"""

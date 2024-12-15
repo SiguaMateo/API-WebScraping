@@ -44,7 +44,7 @@ except Exception as e:
 #                 sub_lot_number NVARCHAR(20),
 #                 sub_auction_date DATE,
 #                 sub_date DATE,
-#                 sub_description NVARCHAR(75),
+#                 sub_description NVARCHAR(100),
 #                 sub_weight INT,
 #                 sub_colour_treated NVARCHAR(20),
 #                 sub_packaging_code INT,
@@ -136,5 +136,5 @@ password_WSCVETS = """SELECT prm_valor
 
 # sql Querys
 insert_query = """
-      INSERT INTO rptFresh_Portal_Subastas_Dev VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      INSERT INTO rptFresh_Portal_Subastas VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 """

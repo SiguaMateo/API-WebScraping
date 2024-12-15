@@ -97,6 +97,18 @@ def go_to_next_page():
         print(f"Error inesperado al intentar pasar a la siguiente página: {e}")
         return False
 
+def clean_value(value):
+    """
+    Limpia y convierte un valor numérico con formato europeo a formato estándar.
+    """
+    try:
+        # Eliminar separadores de miles y convertir a formato de punto decimal
+        value = value.replace('.', '').replace(',', '.')
+        return float(value)
+    except Exception as e:
+        print(f"Error al limpiar valor: '{value}', {e}")
+        return None
+
 # Función principal de scraping
 def scrape_table(url):
     max_retries = 5
@@ -140,7 +152,7 @@ def scrape_table(url):
 
                 for i, row in enumerate(table_rows):
                     cells = row.find_all(['td', 'th'])
-                    cell_values = [cell.get_text(strip=True).replace("€", "").replace("%", "").replace(",", ".") for cell in cells]
+                    cell_values = [cell.get_text(strip=True).replace("€", "").replace("%", "") for cell in cells]
 
                     if i == 0 and not headers:
                         # Almacenar encabezados y omitir la primera y la columna 15
@@ -175,7 +187,7 @@ def scrape_table(url):
             # df.to_csv(csv_filename, index=False)
             # print(f"Datos guardados como '{csv_filename}'")
 
-            csv_filename = f"subastas.csv"
+            csv_filename = f"subastas_new.csv"
             # Verificar si el archivo ya existe
             file_exists = os.path.isfile(csv_filename)
             # Guardar en modo 'append' para no sobreescribir
@@ -201,85 +213,74 @@ def scrape_table(url):
             if retries == max_retries:
                 driver.quit()
 
+def generate_monthly_urls(start_date, end_date):
+    """
+    Genera un rango de URLs mes por mes entre las fechas dadas.
+    """
+    urls = []
+    current_date = start_date
 
-def clean_value(value):
-    try:
-        value = re.sub(r'[^\d.]', '', value.replace(' ', '').replace(',', '.'))
-        if value.count('.') > 1:
-            parts = value.split('.')
-            value = ''.join(parts[:-1]) + '.' + parts[-1]
-        return float(value)
-    except ValueError:
-        return 0.0
-    
-# def generate_monthly_urls(start_date, end_date):
-#     """
-#     Genera un rango de URLs mes por mes entre las fechas dadas.
-#     """
-#     urls = []
-#     current_date = start_date
+    while current_date < end_date:
+        # Definir la primera quincena (día 1 al 15)
+        if current_date.day <= 15:
+            biweekly_end_date = current_date.replace(day=15)
+        else:
+            # Definir la segunda quincena (día 16 al fin del mes)
+            next_month = (current_date.replace(day=28) + timedelta(days=4)).replace(day=1)
+            biweekly_end_date = next_month - timedelta(days=1)
 
-#     while current_date < end_date:
-#         # Definir la primera quincena (día 1 al 15)
-#         if current_date.day <= 15:
-#             biweekly_end_date = current_date.replace(day=15)
-#         else:
-#             # Definir la segunda quincena (día 16 al fin del mes)
-#             next_month = (current_date.replace(day=28) + timedelta(days=4)).replace(day=1)
-#             biweekly_end_date = next_month - timedelta(days=1)
+        # Limitar la fecha final al rango máximo permitido
+        if biweekly_end_date > end_date:
+            biweekly_end_date = end_date
 
-#         # Limitar la fecha final al rango máximo permitido
-#         if biweekly_end_date > end_date:
-#             biweekly_end_date = end_date
-
-#         # Asegurar que las fechas tengan el formato correcto
-#         formatted_start = current_date.strftime('%Y-%m-%d')
-#         formatted_end = biweekly_end_date.strftime('%Y-%m-%d')
+        # Asegurar que las fechas tengan el formato correcto
+        formatted_start = current_date.strftime('%Y-%m-%d')
+        formatted_end = biweekly_end_date.strftime('%Y-%m-%d')
         
-#         # Crear la URL con los parámetros de rango de fechas
-#         url = f"https://fp042301.freshportal.nl/floriday_io_yield/index/index/?1=1&page=1&auction_date_from={formatted_start}&auction_date_to={formatted_end}#!"
-#         urls.append(url)
+        # Crear la URL con los parámetros de rango de fechas
+        url = f"https://fp042301.freshportal.nl/floriday_io_yield/index/index/?1=1&page=1&auction_date_from={formatted_start}&auction_date_to={formatted_end}#!"
+        urls.append(url)
 
-#         # Avanzar al día 16 o al primer día del próximo mes según la quincena
-#         if current_date.day <= 15:
-#             current_date = current_date.replace(day=16)
-#         else:
-#             current_date = (current_date.replace(day=28) + timedelta(days=4)).replace(day=1)
+        # Avanzar al día 16 o al primer día del próximo mes según la quincena
+        if current_date.day <= 15:
+            current_date = current_date.replace(day=16)
+        else:
+            current_date = (current_date.replace(day=28) + timedelta(days=4)).replace(day=1)
 
-#     return urls
+    return urls
 
-# def scrape_monthly_data():
-#     """
-#     Realiza el scraping de datos para todas las fechas especificadas.
-#     """
-#     start_date = datetime.strptime("2024-11-16", '%Y-%m-%d')  # Cambia la fecha según necesites
-#     end_date = datetime.today()
+def scrape_monthly_data():
+    """
+    Realiza el scraping de datos para todas las fechas especificadas.
+    """
+    start_date = datetime.strptime("2023-11-26", '%Y-%m-%d')  # Cambia la fecha según necesites
+    end_date = datetime.today()
 
-#     # Generar las URLs mensuales
-#     monthly_urls = generate_monthly_urls(start_date, end_date)
+    # Generar las URLs mensuales
+    monthly_urls = generate_monthly_urls(start_date, end_date)
 
-#     # Iniciar sesión una vez
-#     login()
+    # Iniciar sesión una vez
+    login()
 
-#     # Archivo CSV único
-#     csv_filename = "subastas.csv"
-#     combined_df = pd.DataFrame()  # Para combinar todos los datos
+    # Archivo CSV único
+    csv_filename = "subastas.csv"
+    combined_df = pd.DataFrame()  # Para combinar todos los datos
 
-#     for url in monthly_urls:
-#         print(f"Scraping datos de URL: {url}")
-#         try:
-#             # Extraer datos de la tabla
-#             temp_df = scrape_table(url)
+    for url in monthly_urls:
+        print(f"Scraping datos de URL: {url}")
+        try:
+            # Extraer datos de la tabla
+            temp_df = scrape_table(url)
 
-#             # Combinar los datos en un DataFrame único
-#             combined_df = pd.concat([combined_df, temp_df], ignore_index=True)
+            # Combinar los datos en un DataFrame único
+            combined_df = pd.concat([combined_df, temp_df], ignore_index=True)
 
-#         except Exception as e:
-#             print(f"Error al procesar la URL: {e}")
+        except Exception as e:
+            print(f"Error al procesar la URL: {e}")
 
-#     # Guardar los datos combinados en un CSV
-#     combined_df.to_csv(csv_filename, index=False)
-#     print(f"Todos los datos se guardaron en '{csv_filename}'.")
+    # Guardar los datos combinados en un CSV
+    combined_df.to_csv(csv_filename, index=False)
+    print(f"Todos los datos se guardaron en '{csv_filename}'.")
 
-# # Llamar a la función principal
-# scrape_monthly_data()
+# Llamar a la función principal
+scrape_monthly_data()
